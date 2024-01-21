@@ -200,4 +200,55 @@ document.addEventListener('DOMContentLoaded', () => {
       popupDetailsToggle();
     }
   });
+
+document.addEventListener('DOMContentLoaded', function() {
+  const contactForm = document.querySelector('.contact-form');
+  const submitButton = contactForm.querySelector('button[type="submit"]');
+  const originalButtonText = submitButton.textContent;
+
+  contactForm.addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent the default form submission
+
+    // Display loading message or spinner
+    submitButton.textContent = 'Sending...';
+    submitButton.disabled = true;
+
+    fetch(contactForm.action, {
+      method: 'POST',
+      body: new FormData(contactForm),
+      headers: {
+        'Accept': 'application/json'
+      },
+    })
+    .then(response => {
+      if (response.ok) {
+        // Handle successful submission here
+        alert('Message sent successfully!');
+        contactForm.reset();
+        submitButton.textContent = originalButtonText;
+      } else {
+        // Handle error here
+        alert('There was an error sending your message. Please try again.');
+      }
+    })
+    .catch(error => {
+      // Handle network error here
+      alert('Network error. Please check your internet connection and try again.');
+    })
+    .finally(() => {
+      submitButton.disabled = false;
+    });
+  });
+});
+
+
+
+
+
+
+
+
+
+
+  
 })();
