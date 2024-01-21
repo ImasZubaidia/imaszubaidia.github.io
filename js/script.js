@@ -94,18 +94,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const img = portfolioItem.querySelector(".portfolio-item-img img");
       if (img) {
         screenshots = img.getAttribute("data-screenshots").split(",");
+        preloadScreenshots(screenshots); // Preload images
         slideIndex = 0;
         popupToggle();
         popupSlideshow();
         popupDetails();
       }
-    }
-  });
-
-  closeBtn.addEventListener("click", () => {
-    popupToggle();
-    if (projectDetailsContainer.classList.contains("active")) {
-      popupDetailsToggle();
     }
   });
 
@@ -129,16 +123,18 @@ document.addEventListener('DOMContentLoaded', () => {
     popup.querySelector(".pp-counter").style.display = "none";
     popup.querySelector(".pp-loader").classList.add("active");
 
-    if (!popupImg.getAttribute("src") || popupImg.getAttribute("src") !== imgSrc) {
+    if (popupImg.getAttribute("src") !== imgSrc) {
       const img = new Image();
       img.onload = () => {
         popup.querySelector(".pp-loader").classList.remove("active");
-        popupImg.style.display = "block";
         popupImg.src = imgSrc;
+        popupImg.style.display = "block";
         updatePopupControls();
       };
       img.src = imgSrc;
     } else {
+      popup.querySelector(".pp-loader").classList.remove("active");
+      popupImg.style.display = "block";
       updatePopupControls();
     }
   }
@@ -153,21 +149,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function preloadScreenshots(screenshots) {
+    screenshots.forEach(src => {
+      const img = new Image();
+      img.src = src;
+    });
+  }
+
   nextBtn.addEventListener("click", () => {
-    if (slideIndex === screenshots.length - 1) {
-      slideIndex = 0;
-    } else {
-      slideIndex++;
-    }
+    slideIndex = (slideIndex + 1) % screenshots.length;
     popupSlideshow();
   });
 
   prevBtn.addEventListener("click", () => {
-    if (slideIndex === 0) {
-      slideIndex = screenshots.length - 1;
-    } else {
-      slideIndex--;
-    }
+    slideIndex = (slideIndex - 1 + screenshots.length) % screenshots.length;
     popupSlideshow();
   });
 
@@ -198,4 +193,11 @@ document.addEventListener('DOMContentLoaded', () => {
       popup.scrollTo(0, projectDetailsContainer.offsetTop);
     }
   }
+
+  closeBtn.addEventListener("click", () => {
+    popupToggle();
+    if (projectDetailsContainer.classList.contains("active")) {
+      popupDetailsToggle();
+    }
+  });
 })();
