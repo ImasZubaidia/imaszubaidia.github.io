@@ -55,7 +55,27 @@ document.addEventListener('DOMContentLoaded', () => {
     aboutSection.style.display = 'block';
     aboutFilterItem.classList.add('active');
   }
+
+  // Countdown functionality
+  const countdownElement = document.querySelector('.loader-countdown');
+  let countdown = 3; // Start countdown from 3
+
+  // Function to update the countdown
+  function updateCountdown() {
+    if (countdown === 0) {
+      // Hide loader and show screenshots here
+      // For example: document.querySelector('.pp-img').src = 'path_to_your_screenshot.jpg';
+    } else {
+      countdownElement.innerText = countdown;
+      countdown--;
+      setTimeout(updateCountdown, 1000);
+    }
+  }
+
+  // Start the countdown
+  setTimeout(updateCountdown, 1000);
 });
+
 
 (() => {
   const filterContainer = document.querySelector(".portfolio-filter"),
@@ -95,17 +115,40 @@ document.addEventListener('DOMContentLoaded', () => {
       slideIndex = 0;
       popupToggle();
       popupSlideshow();
+      document.querySelector('.loader-countdown').style.display = 'block';
+      document.querySelector('.pp-loader').classList.add('active');
+      startCountdown();
     }
   });
 
+
+  function startCountdown() {
+    const countdownElement = document.querySelector('.loader-countdown');
+    let countdown = 3; // Start countdown from 3
+  
+    function updateCountdown() {
+      countdownElement.innerText = countdown;
+      if (countdown > 1) {
+        countdown--;
+        setTimeout(updateCountdown, 1000); // Wait 1 second before updating the countdown
+      } else {
+        countdownElement.style.display = 'none'; // Hide countdown
+        popupSlideshow(); // Show the screenshot
+      }
+    }
+    updateCountdown(); // Start the countdown
+  }
   function preloadScreenshots(screenshots) {
+    // Enhance the preloading logic for better performance
     screenshots.forEach(src => {
       const img = new Image();
       img.src = src;
-      img.loading = "lazy"; // Add lazy loading attribute
+      img.onload = () => console.log("Image preloaded: " + src);
+      img.onerror = () => console.error("Failed to preload image: " + src);
+      img.loading = "lazy";
     });
   }
-  
+
 
   function popupToggle() {
     popup.classList.toggle("open");
@@ -122,7 +165,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const imgSrc = screenshots[slideIndex];
     const popupImg = popup.querySelector(".pp-img");
     popupImg.style.display = "none";
-    popup.querySelector(".pp-loader").classList.add("active");
+  
+    // Hide buttons initially
+    projectDetailsBtn.style.display = "none";
+    closeBtn.style.display = "none";
+    prevBtn.style.display = "none";
+    nextBtn.style.display = "none";
   
     const img = new Image();
     img.onload = () => {
@@ -130,20 +178,24 @@ document.addEventListener('DOMContentLoaded', () => {
       popupImg.src = imgSrc;
       popupImg.style.display = "block";
   
-      // Delay for displaying the project details button after the image has loaded
-      setTimeout(() => {
-        if (portfolioItems[itemIndex].querySelector(".portfolio-item-details")) {
-          projectDetailsBtn.style.display = "block";
-          const details = portfolioItems[itemIndex].querySelector(".portfolio-item-details").innerHTML;
-          popup.querySelector(".pp-project-details").innerHTML = details;
-        }
-      }, 500); // Adjust this delay as needed (currently 500 milliseconds or 0.5 seconds)
+      // Show buttons immediately after the image has loaded
+      if (portfolioItems[itemIndex].querySelector(".portfolio-item-details")) {
+        projectDetailsBtn.style.display = "block";
+        const details = portfolioItems[itemIndex].querySelector(".portfolio-item-details").innerHTML;
+        popup.querySelector(".pp-project-details").innerHTML = details;
+      }
+      closeBtn.style.display = "block";
+  
+      // Show prev and next buttons only if there are multiple screenshots
+      if (screenshots.length > 1) {
+        prevBtn.style.display = "block";
+        nextBtn.style.display = "block";
+      }
   
       updatePopupControls();
     };
     img.src = imgSrc;
   }
-  
   
 
   function updatePopupControls() {
