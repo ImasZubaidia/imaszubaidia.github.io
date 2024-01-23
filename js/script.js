@@ -105,6 +105,8 @@ document.addEventListener('DOMContentLoaded', () => {
       img.loading = "lazy"; // Add lazy loading attribute
     });
   }
+  
+
   function popupToggle() {
     popup.classList.toggle("open");
     if (popup.classList.contains("open")) {
@@ -121,21 +123,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const popupImg = popup.querySelector(".pp-img");
     popupImg.style.display = "none";
     popup.querySelector(".pp-loader").classList.add("active");
-
+  
     const img = new Image();
     img.onload = () => {
       popup.querySelector(".pp-loader").classList.remove("active");
       popupImg.src = imgSrc;
       popupImg.style.display = "block";
-      // Display project details and page counter after image loads
-      if (portfolioItems[itemIndex].querySelector(".portfolio-item-details")) {
-        projectDetailsBtn.style.display = "block";
-        const details = portfolioItems[itemIndex].querySelector(".portfolio-item-details").innerHTML;
-        popup.querySelector(".pp-project-details").innerHTML = details;
-      }
-      popup.querySelector(".pp-counter").innerHTML = (slideIndex + 1) + " of " + screenshots.length;
+  
+      // Delay for displaying the project details button after the image has loaded
+      setTimeout(() => {
+        if (portfolioItems[itemIndex].querySelector(".portfolio-item-details")) {
+          projectDetailsBtn.style.display = "block";
+          const details = portfolioItems[itemIndex].querySelector(".portfolio-item-details").innerHTML;
+          popup.querySelector(".pp-project-details").innerHTML = details;
+        }
+      }, 500); // Adjust this delay as needed (currently 500 milliseconds or 0.5 seconds)
+  
+      updatePopupControls();
     };
     img.src = imgSrc;
+  }
+  
+  
+
+  function updatePopupControls() {
+    popup.querySelector(".pp-counter").innerHTML = (slideIndex + 1) + " of " + screenshots.length;
+    prevBtn.style.display = screenshots.length > 1 ? "block" : "none";
+    nextBtn.style.display = screenshots.length > 1 ? "block" : "none";
+    const title = portfolioItems[itemIndex].querySelector(".portfolio-item-title").innerHTML;
+    popup.querySelector(".pp-title h2").innerHTML = title;
+    const category = portfolioItems[itemIndex].getAttribute("data-category");
+    popup.querySelector(".pp-project-category").innerHTML = category.split("-").join(" ");
   }
 
   nextBtn.addEventListener("click", () => {
