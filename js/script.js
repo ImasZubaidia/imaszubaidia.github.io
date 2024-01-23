@@ -102,9 +102,9 @@ document.addEventListener('DOMContentLoaded', () => {
     screenshots.forEach(src => {
       const img = new Image();
       img.src = src;
+      img.loading = "lazy"; // Add lazy loading attribute
     });
   }
-
   function popupToggle() {
     popup.classList.toggle("open");
     if (popup.classList.contains("open")) {
